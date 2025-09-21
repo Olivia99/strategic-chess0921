@@ -46,19 +46,24 @@ export default function GameBoard({
 
   // Convert board coordinates to pixel positions
   const getIntersectionStyle = (x: number, y: number) => {
-    const cellSize = 80; // Increased size of each grid cell
-    const offset = 40; // Half cell size to center on intersections
+    const cellSize = 80;           // Grid cell size
+    const containerPadding = 16;   // Container p-4 = 16px
+    const svgSize = boardPixelSize - 32; // SVG size after removing padding
+    const boardSize = cellSize * (BOARD_SIZE - 1); // 480px
+    const gridMargin = (svgSize - boardSize) / 2; // 24px margin in SVG
     
     return {
-      left: `${x * cellSize + offset}px`,
-      top: `${y * cellSize + offset}px`,
+      left: `${containerPadding + gridMargin + x * cellSize}px`,
+      top: `${containerPadding + gridMargin + y * cellSize}px`, 
       transform: 'translate(-50%, -50%)'
     };
   };
 
   const renderGridLines = () => {
     const cellSize = 80;
-    const boardSize = cellSize * (BOARD_SIZE - 1);
+    const boardSize = cellSize * (BOARD_SIZE - 1); // 480px
+    const svgSize = boardPixelSize - 32; // 528px  
+    const gridMargin = (svgSize - boardSize) / 2; // 24px
     const lines = [];
 
     // Horizontal lines
@@ -66,10 +71,10 @@ export default function GameBoard({
       lines.push(
         <line
           key={`h-${i}`}
-          x1={40}
-          y1={40 + i * cellSize}
-          x2={40 + boardSize}
-          y2={40 + i * cellSize}
+          x1={gridMargin}
+          y1={gridMargin + i * cellSize}
+          x2={gridMargin + boardSize}
+          y2={gridMargin + i * cellSize}
           stroke="white"
           strokeWidth="2"
         />
@@ -81,10 +86,10 @@ export default function GameBoard({
       lines.push(
         <line
           key={`v-${i}`}
-          x1={40 + i * cellSize}
-          y1={40}
-          x2={40 + i * cellSize}
-          y2={40 + boardSize}
+          x1={gridMargin + i * cellSize}
+          y1={gridMargin}
+          x2={gridMargin + i * cellSize}
+          y2={gridMargin + boardSize}
           stroke="white"
           strokeWidth="2"
         />
@@ -121,24 +126,45 @@ export default function GameBoard({
       <div className="relative bg-gray-600 shadow-lg rounded-lg p-4" style={{ width: boardPixelSize, height: boardPixelSize }}>
         {/* Grid lines */}
         <svg 
-          className="absolute inset-0" 
-          width={boardPixelSize} 
-          height={boardPixelSize}
+          className="absolute" 
+          style={{ 
+            left: '16px', 
+            top: '16px', 
+            width: `${boardPixelSize - 32}px`, 
+            height: `${boardPixelSize - 32}px` 
+          }}
+          width={boardPixelSize - 32} 
+          height={boardPixelSize - 32}
         >
           {renderGridLines()}
         </svg>
 
         {/* Special position markers */}
-        {specialPositions.map((pos, index) => (
-          <div
-            key={`special-${index}`}
-            className="absolute"
-            style={getIntersectionStyle(pos.x, pos.y)}
-          >
-            <div className="w-6 h-6 transform rotate-45 bg-yellow-400 border-2 border-yellow-600 opacity-70" 
-                 style={{ transform: 'translate(-50%, -50%) rotate(45deg)' }} />
-          </div>
-        ))}
+        {specialPositions.map((pos, index) => {
+          const cellSize = 80;
+          const containerPadding = 16;
+          const svgSize = boardPixelSize - 32;
+          const boardSize = cellSize * (BOARD_SIZE - 1);
+          const gridMargin = (svgSize - boardSize) / 2;
+          
+          // Calculate exact center position without nested transforms
+          const centerX = containerPadding + gridMargin + pos.x * cellSize;
+          const centerY = containerPadding + gridMargin + pos.y * cellSize;
+          
+          return (
+            <div
+              key={`special-${index}`}
+              className="absolute w-6 h-6 border-2 bg-transparent"
+              style={{ 
+                left: `${centerX - 12}px`, // 12px = half of w-6 (24px)
+                top: `${centerY - 12}px`,  // 12px = half of h-6 (24px)
+                transform: 'rotate(45deg)',
+                borderColor: '#EAB308',
+                zIndex: 5
+              }}
+            />
+          );
+        })}
 
         {/* Coordinate labels */}
         {Array.from({ length: BOARD_SIZE }, (_, i) => (
@@ -147,8 +173,8 @@ export default function GameBoard({
             <div 
               className="absolute text-white font-bold text-sm"
               style={{ 
-                left: `${40 + i * 80}px`, 
-                top: '8px',
+                left: `${16 + 24 + i * 80}px`, 
+                top: '2px',
                 transform: 'translateX(-50%)'
               }}
             >
@@ -158,8 +184,8 @@ export default function GameBoard({
             <div 
               className="absolute text-white font-bold text-sm"
               style={{ 
-                left: '8px', 
-                top: `${40 + i * 80}px`,
+                left: '2px', 
+                top: `${16 + 24 + i * 80}px`,
                 transform: 'translateY(-50%)'
               }}
             >
@@ -167,6 +193,7 @@ export default function GameBoard({
             </div>
           </React.Fragment>
         ))}
+
 
         {/* Intersection points and pieces */}
         {Array.from({ length: BOARD_SIZE }, (_, y) =>

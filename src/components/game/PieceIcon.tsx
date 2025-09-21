@@ -25,11 +25,26 @@ const PIECE_FILES: Record<PieceType, string> = {
 export default function PieceIcon({ type, player, size = 40, className = '' }: PieceIconProps) {
   const iconSrc = PIECE_FILES[type];
   
-  // Color filter for white/black teams
-  const colorFilter = player === 'white' 
-    ? 'brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%)'  // White
-    : 'brightness(0) saturate(100%) invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%)'; // Black (100% opacity)
+  if (player === 'black') {
+    // For black pieces, use a solid background color overlay
+    return (
+      <div 
+        className={`relative ${className}`}
+        style={{ width: size, height: size }}
+      >
+        <div 
+          className="absolute inset-0 rounded"
+          style={{ 
+            backgroundColor: 'rgba(49, 49, 49, 1)',
+            mask: `url(${iconSrc}) center/contain no-repeat`,
+            WebkitMask: `url(${iconSrc}) center/contain no-repeat`
+          }}
+        />
+      </div>
+    );
+  }
 
+  // For white pieces, use filter
   return (
     <div 
       className={`relative ${className}`}
@@ -42,7 +57,7 @@ export default function PieceIcon({ type, player, size = 40, className = '' }: P
         height={size}
         className="transition-all duration-200"
         style={{
-          filter: colorFilter,
+          filter: 'brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%)'
         }}
       />
     </div>
