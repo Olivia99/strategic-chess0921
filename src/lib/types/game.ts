@@ -51,6 +51,11 @@ export type Hero = {
   unlockedAbilities: string[];
 };
 
+export type VictoryType = 'commander' | 'trophy' | null;
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export type ConversionState = {};
+
 export type GameState = {
   board: (Piece | null)[][];
   currentPlayer: Player;
@@ -62,6 +67,7 @@ export type GameState = {
   possibleMoves: Position[];
   gamePhase: 'setup' | 'heroSelection' | 'playing' | 'gameOver';
   winner: Player | null;
+  victoryType: VictoryType;
   turnCount: number;
   players: {
     white: {
@@ -71,6 +77,7 @@ export type GameState = {
       hero: Hero | null;
     };
   };
+  conversionState: ConversionState;
 };
 
 export type GameAction = 
