@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { Piece, Position, Player } from '@/lib/types/game';
-import { BOARD_SIZE, isValidPosition } from '@/lib/game/board';
+import { BOARD_SIZE } from '@/lib/game/board';
+import PieceIcon from './PieceIcon';
 
 interface GameBoardProps {
   board: (Piece | null)[][];
@@ -11,25 +12,6 @@ interface GameBoardProps {
   currentPlayer: Player;
   onSquareClick: (position: Position) => void;
 }
-
-const PIECE_SYMBOLS: Record<string, string> = {
-  'red-commander': '⭐',
-  'blue-commander': '🌟',
-  'red-soldier': '♦️',
-  'blue-soldier': '🔹',
-  'red-guard': '🛡️',
-  'blue-guard': '🛡️',
-  'red-raider': '⚔️',
-  'blue-raider': '⚔️',
-  'red-horse': '🐎',
-  'blue-horse': '🐴',
-  'red-elephant': '🐘',
-  'blue-elephant': '🐘',
-  'red-tower': '🏰',
-  'blue-tower': '🏯',
-  'red-artillery': '💥',
-  'blue-artillery': '💣',
-};
 
 export default function GameBoard({ 
   board, 
@@ -48,29 +30,71 @@ export default function GameBoard({
            selectedPiece.position.y === position.y;
   };
 
-  const getSquareClassName = (position: Position): string => {
-    const baseClass = 'w-16 h-16 border border-gray-400 flex items-center justify-center cursor-pointer transition-all duration-200 relative';
+  const getIntersectionClassName = (position: Position): string => {
+    let className = 'absolute w-12 h-12 flex items-center justify-center cursor-pointer transition-all duration-200 z-10';
     
-    let colorClass = '';
-    if ((position.x + position.y) % 2 === 0) {
-      colorClass = 'bg-amber-100 hover:bg-amber-200';
-    } else {
-      colorClass = 'bg-amber-200 hover:bg-amber-300';
-    }
-
     if (isSelected(position)) {
-      colorClass = 'bg-blue-300 ring-2 ring-blue-500';
+      className += ' bg-blue-400 rounded-full bg-opacity-50';
     } else if (isPossibleMove(position)) {
-      colorClass = 'bg-green-200 hover:bg-green-300';
+      className += ' bg-green-400 rounded-full bg-opacity-30 hover:bg-opacity-50';
+    } else {
+      className += ' hover:bg-gray-300 hover:bg-opacity-30 rounded-full';
     }
 
-    return `${baseClass} ${colorClass}`;
+    return className;
   };
 
-  const getPieceSymbol = (piece: Piece): string => {
-    const key = `${piece.player}-${piece.type}`;
-    return PIECE_SYMBOLS[key] || '❓';
+  // Convert board coordinates to pixel positions
+  const getIntersectionStyle = (x: number, y: number) => {
+    const cellSize = 60; // Size of each grid cell
+    const offset = 30; // Half cell size to center on intersections
+    
+    return {
+      left: `${x * cellSize + offset}px`,
+      top: `${y * cellSize + offset}px`,
+      transform: 'translate(-50%, -50%)'
+    };
   };
+
+  const renderGridLines = () => {
+    const cellSize = 60;
+    const boardSize = cellSize * (BOARD_SIZE - 1);
+    const lines = [];
+
+    // Horizontal lines
+    for (let i = 0; i < BOARD_SIZE; i++) {
+      lines.push(
+        <line
+          key={`h-${i}`}
+          x1={30}
+          y1={30 + i * cellSize}
+          x2={30 + boardSize}
+          y2={30 + i * cellSize}
+          stroke="white"
+          strokeWidth="2"
+        />
+      );
+    }
+
+    // Vertical lines
+    for (let i = 0; i < BOARD_SIZE; i++) {
+      lines.push(
+        <line
+          key={`v-${i}`}
+          x1={30 + i * cellSize}
+          y1={30}
+          x2={30 + i * cellSize}
+          y2={30 + boardSize}
+          stroke="white"
+          strokeWidth="2"
+        />
+      );
+    }
+
+    return lines;
+  };
+
+  const boardPixelSize = 60 * (BOARD_SIZE - 1) + 60; // Total board size in pixels
 
   return (
     <div className="flex flex-col items-center space-y-4">
@@ -85,7 +109,45 @@ export default function GameBoard({
         </span>
       </div>
       
-      <div className="grid grid-cols-7 gap-0 border-2 border-gray-600 bg-white shadow-lg rounded-lg overflow-hidden">
+      <div className="relative bg-gray-600 shadow-lg rounded-lg p-4" style={{ width: boardPixelSize, height: boardPixelSize }}>
+        {/* Grid lines */}
+        <svg 
+          className="absolute inset-0" 
+          width={boardPixelSize} 
+          height={boardPixelSize}
+        >
+          {renderGridLines()}
+        </svg>
+
+        {/* Coordinate labels */}
+        {Array.from({ length: BOARD_SIZE }, (_, i) => (
+          <React.Fragment key={`coords-${i}`}>
+            {/* Column labels (A-G) */}
+            <div 
+              className="absolute text-white font-bold text-sm"
+              style={{ 
+                left: `${30 + i * 60}px`, 
+                top: '5px',
+                transform: 'translateX(-50%)'
+              }}
+            >
+              {String.fromCharCode(65 + i)}
+            </div>
+            {/* Row labels (1-7) */}
+            <div 
+              className="absolute text-white font-bold text-sm"
+              style={{ 
+                left: '5px', 
+                top: `${30 + i * 60}px`,
+                transform: 'translateY(-50%)'
+              }}
+            >
+              {BOARD_SIZE - i}
+            </div>
+          </React.Fragment>
+        ))}
+
+        {/* Intersection points and pieces */}
         {Array.from({ length: BOARD_SIZE }, (_, y) =>
           Array.from({ length: BOARD_SIZE }, (_, x) => {
             const position: Position = { x, y };
@@ -94,32 +156,30 @@ export default function GameBoard({
             return (
               <div
                 key={`${x}-${y}`}
-                className={getSquareClassName(position)}
+                className={getIntersectionClassName(position)}
+                style={getIntersectionStyle(x, y)}
                 onClick={() => onSquareClick(position)}
               >
                 {piece && (
-                  <span 
-                    className={`text-2xl select-none ${
+                  <PieceIcon
+                    type={piece.type}
+                    player={piece.player}
+                    size={45}
+                    className={`${
                       piece.player === currentPlayer 
                         ? 'opacity-100' 
                         : 'opacity-75'
-                    }`}
-                  >
-                    {getPieceSymbol(piece)}
-                  </span>
+                    } ${isSelected(position) ? 'scale-110' : ''}`}
+                  />
                 )}
                 
                 {isPossibleMove(position) && !piece && (
-                  <div className="w-4 h-4 bg-green-500 rounded-full opacity-60" />
+                  <div className="w-4 h-4 bg-green-500 rounded-full opacity-80" />
                 )}
                 
                 {isPossibleMove(position) && piece && (
-                  <div className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full" />
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border border-white" />
                 )}
-                
-                <div className="absolute bottom-0 left-0 text-xs text-gray-500 p-1 leading-none">
-                  {String.fromCharCode(65 + x)}{7 - y}
-                </div>
               </div>
             );
           })
@@ -129,7 +189,7 @@ export default function GameBoard({
       <div className="text-sm text-gray-600 max-w-md text-center">
         {selectedPiece ? (
           <p>
-            Selected: <strong>{selectedPiece.type}</strong> at {String.fromCharCode(65 + selectedPiece.position.x)}{7 - selectedPiece.position.y}
+            Selected: <strong>{selectedPiece.type}</strong> at {String.fromCharCode(65 + selectedPiece.position.x)}{BOARD_SIZE - selectedPiece.position.y}
             {possibleMoves.length > 0 && ` • ${possibleMoves.length} possible moves`}
           </p>
         ) : (
