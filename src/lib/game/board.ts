@@ -5,8 +5,8 @@ export const BOARD_SIZE = 7;
 export function createInitialBoard(): (Piece | null)[][] {
   const board: (Piece | null)[][] = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null));
   
-  // Red pieces (bottom - white pieces in image)
-  const redPieces: { type: PieceType; x: number; y: number }[] = [
+  // White pieces (bottom - white pieces in image)
+  const whitePieces: { type: PieceType; x: number; y: number }[] = [
     // Back row (y=6) - Tower, Horse, Guard, Commander, Guard, Horse, Tower
     { type: 'tower', x: 0, y: 6 },
     { type: 'horse', x: 1, y: 6 },
@@ -26,8 +26,8 @@ export function createInitialBoard(): (Piece | null)[][] {
     { type: 'soldier', x: 6, y: 5 },
   ];
 
-  // Blue pieces (top - black pieces in image)
-  const bluePieces: { type: PieceType; x: number; y: number }[] = [
+  // Black pieces (top - black pieces in image)
+  const blackPieces: { type: PieceType; x: number; y: number }[] = [
     // Back row (y=0) - Tower, Horse, Guard, Commander, Guard, Horse, Tower
     { type: 'tower', x: 0, y: 0 },
     { type: 'horse', x: 1, y: 0 },
@@ -47,23 +47,23 @@ export function createInitialBoard(): (Piece | null)[][] {
     { type: 'soldier', x: 6, y: 1 },
   ];
 
-  // Place red pieces
-  redPieces.forEach((pieceData, index) => {
+  // Place white pieces
+  whitePieces.forEach((pieceData, index) => {
     board[pieceData.y][pieceData.x] = {
-      id: `red-${index}`,
+      id: `white-${index}`,
       type: pieceData.type,
-      player: 'red',
+      player: 'white',
       position: { x: pieceData.x, y: pieceData.y },
       hasMoved: false
     };
   });
 
-  // Place blue pieces
-  bluePieces.forEach((pieceData, index) => {
+  // Place black pieces
+  blackPieces.forEach((pieceData, index) => {
     board[pieceData.y][pieceData.x] = {
-      id: `blue-${index}`,
+      id: `black-${index}`,
       type: pieceData.type,
-      player: 'blue',
+      player: 'black',
       position: { x: pieceData.x, y: pieceData.y },
       hasMoved: false
     };
@@ -97,7 +97,7 @@ export function isPositionsEqual(pos1: Position, pos2: Position): boolean {
 }
 
 export function getPlayerHomeRows(player: Player): number[] {
-  return player === 'red' ? [4, 5, 6] : [0, 1, 2];
+  return player === 'white' ? [4, 5, 6] : [0, 1, 2];
 }
 
 export function isInHomeRows(position: Position, player: Player): boolean {

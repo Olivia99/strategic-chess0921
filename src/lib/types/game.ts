@@ -8,7 +8,7 @@ export type PieceType =
   | 'tower' 
   | 'artillery';
 
-export type Player = 'red' | 'blue';
+export type Player = 'white' | 'black';
 
 export type Position = {
   x: number;
@@ -55,8 +55,8 @@ export type GameState = {
   board: (Piece | null)[][];
   currentPlayer: Player;
   trophyPoints: {
-    red: number;
-    blue: number;
+    white: number;
+    black: number;
   };
   selectedPiece: Piece | null;
   possibleMoves: Position[];
@@ -64,10 +64,10 @@ export type GameState = {
   winner: Player | null;
   turnCount: number;
   players: {
-    red: {
+    white: {
       hero: Hero | null;
     };
-    blue: {
+    black: {
       hero: Hero | null;
     };
   };

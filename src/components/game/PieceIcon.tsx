@@ -25,10 +25,10 @@ const PIECE_FILES: Record<PieceType, string> = {
 export default function PieceIcon({ type, player, size = 40, className = '' }: PieceIconProps) {
   const iconSrc = PIECE_FILES[type];
   
-  // Color filter for red/blue teams
-  const colorFilter = player === 'red' 
-    ? 'brightness(0) saturate(100%) invert(18%) sepia(85%) saturate(2498%) hue-rotate(345deg) brightness(95%) contrast(95%)'  // Red
-    : 'brightness(0) saturate(100%) invert(25%) sepia(95%) saturate(2578%) hue-rotate(215deg) brightness(95%) contrast(90%)'; // Blue
+  // Color filter for white/black teams
+  const colorFilter = player === 'white' 
+    ? 'brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%)'  // White
+    : 'brightness(0) saturate(100%) invert(10%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(10%) contrast(100%)'; // Black (not fully transparent)
 
   return (
     <div 

@@ -8,16 +8,16 @@ import { createInitialBoard } from '@/lib/game/board';
 export default function GamePage() {
   const [gameState, setGameState] = useState<GameState>({
     board: createInitialBoard(),
-    currentPlayer: 'red',
-    trophyPoints: { red: 0, blue: 0 },
+    currentPlayer: 'white',
+    trophyPoints: { white: 0, black: 0 },
     selectedPiece: null,
     possibleMoves: [],
     gamePhase: 'playing',
     winner: null,
     turnCount: 1,
     players: {
-      red: { hero: null },
-      blue: { hero: null }
+      white: { hero: null },
+      black: { hero: null }
     }
   });
 
@@ -66,14 +66,14 @@ export default function GamePage() {
             ⚔️ Strategic Chess
           </h1>
           <div className="flex justify-center items-center space-x-8 text-lg">
-            <div className="bg-red-100 px-4 py-2 rounded-lg">
-              <span className="font-semibold text-red-800">Red: </span>
-              <span className="text-red-600">{gameState.trophyPoints.red} 🏆</span>
+            <div className="bg-gray-100 px-4 py-2 rounded-lg">
+              <span className="font-semibold text-gray-800">White: </span>
+              <span className="text-gray-600">{gameState.trophyPoints.white} 🏆</span>
             </div>
             <div className="text-gray-600">Turn {gameState.turnCount}</div>
-            <div className="bg-blue-100 px-4 py-2 rounded-lg">
-              <span className="font-semibold text-blue-800">Blue: </span>
-              <span className="text-blue-600">{gameState.trophyPoints.blue} 🏆</span>
+            <div className="bg-gray-800 px-4 py-2 rounded-lg">
+              <span className="font-semibold text-white">Black: </span>
+              <span className="text-gray-200">{gameState.trophyPoints.black} 🏆</span>
             </div>
           </div>
         </div>

@@ -31,7 +31,7 @@ export default function GameBoard({
   };
 
   const getIntersectionClassName = (position: Position): string => {
-    let className = 'absolute w-12 h-12 flex items-center justify-center cursor-pointer transition-all duration-200 z-10';
+    let className = 'absolute w-16 h-16 flex items-center justify-center cursor-pointer transition-all duration-200 z-10';
     
     if (isSelected(position)) {
       className += ' bg-blue-400 rounded-full bg-opacity-50';
@@ -46,8 +46,8 @@ export default function GameBoard({
 
   // Convert board coordinates to pixel positions
   const getIntersectionStyle = (x: number, y: number) => {
-    const cellSize = 60; // Size of each grid cell
-    const offset = 30; // Half cell size to center on intersections
+    const cellSize = 80; // Increased size of each grid cell
+    const offset = 40; // Half cell size to center on intersections
     
     return {
       left: `${x * cellSize + offset}px`,
@@ -57,7 +57,7 @@ export default function GameBoard({
   };
 
   const renderGridLines = () => {
-    const cellSize = 60;
+    const cellSize = 80;
     const boardSize = cellSize * (BOARD_SIZE - 1);
     const lines = [];
 
@@ -66,10 +66,10 @@ export default function GameBoard({
       lines.push(
         <line
           key={`h-${i}`}
-          x1={30}
-          y1={30 + i * cellSize}
-          x2={30 + boardSize}
-          y2={30 + i * cellSize}
+          x1={40}
+          y1={40 + i * cellSize}
+          x2={40 + boardSize}
+          y2={40 + i * cellSize}
           stroke="white"
           strokeWidth="2"
         />
@@ -81,10 +81,10 @@ export default function GameBoard({
       lines.push(
         <line
           key={`v-${i}`}
-          x1={30 + i * cellSize}
-          y1={30}
-          x2={30 + i * cellSize}
-          y2={30 + boardSize}
+          x1={40 + i * cellSize}
+          y1={40}
+          x2={40 + i * cellSize}
+          y2={40 + boardSize}
           stroke="white"
           strokeWidth="2"
         />
@@ -94,13 +94,14 @@ export default function GameBoard({
     return lines;
   };
 
-  const boardPixelSize = 60 * (BOARD_SIZE - 1) + 60; // Total board size in pixels
+  const boardPixelSize = 80 * (BOARD_SIZE - 1) + 80; // Total board size in pixels
 
   // Special positions (golden diamond markers in center row)
+  // 4B = x:1, y:3, 4D = x:3, y:3, 4F = x:5, y:3
   const specialPositions = [
-    { x: 1, y: 3 },
-    { x: 3, y: 3 }, 
-    { x: 5, y: 3 }
+    { x: 1, y: 3 }, // 4B
+    { x: 3, y: 3 }, // 4D
+    { x: 5, y: 3 }  // 4F
   ];
 
 
@@ -109,11 +110,11 @@ export default function GameBoard({
       <div className="text-lg font-semibold text-gray-700">
         Current Player: 
         <span className={`ml-2 px-3 py-1 rounded ${
-          currentPlayer === 'red' 
-            ? 'bg-red-200 text-red-800' 
-            : 'bg-blue-200 text-blue-800'
+          currentPlayer === 'white' 
+            ? 'bg-gray-200 text-gray-800' 
+            : 'bg-gray-800 text-white'
         }`}>
-          {currentPlayer === 'red' ? 'Red' : 'Blue'}
+          {currentPlayer === 'white' ? 'White' : 'Black'}
         </span>
       </div>
       
@@ -146,8 +147,8 @@ export default function GameBoard({
             <div 
               className="absolute text-white font-bold text-sm"
               style={{ 
-                left: `${30 + i * 60}px`, 
-                top: '5px',
+                left: `${40 + i * 80}px`, 
+                top: '8px',
                 transform: 'translateX(-50%)'
               }}
             >
@@ -157,8 +158,8 @@ export default function GameBoard({
             <div 
               className="absolute text-white font-bold text-sm"
               style={{ 
-                left: '5px', 
-                top: `${30 + i * 60}px`,
+                left: '8px', 
+                top: `${40 + i * 80}px`,
                 transform: 'translateY(-50%)'
               }}
             >
@@ -184,7 +185,7 @@ export default function GameBoard({
                   <PieceIcon
                     type={piece.type}
                     player={piece.player}
-                    size={45}
+                    size={60}
                     className={`${
                       piece.player === currentPlayer 
                         ? 'opacity-100' 
