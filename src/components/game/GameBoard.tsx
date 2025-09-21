@@ -185,7 +185,7 @@ export default function GameBoard({
                   <PieceIcon
                     type={piece.type}
                     player={piece.player}
-                    size={60}
+                    size={50}
                     className={`${
                       piece.player === currentPlayer 
                         ? 'opacity-100' 
