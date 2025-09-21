@@ -10,7 +10,6 @@ import { VictoryConditions } from '@/lib/game/victory';
 import { ToastContainer, ToastMessage } from '@/components/ui/Toast';
 import GuardInvincibilityModal from '@/components/game/GuardInvincibilityModal';
 import HeroAbilityPanel from '@/components/game/HeroAbilityPanel';
-import PieceConversionDialog from '@/components/game/PieceConversionDialog';
 import { HeroManager, HeroGameState } from '@/lib/heroes/heroManager';
 import { PieceConversion } from '@/lib/game/conversion';
 
@@ -46,9 +45,6 @@ export default function GamePage() {
     player: 'white' | 'black';
   } | null>(null);
   
-  // Conversion dialog state
-  const [conversionDialogOpen, setConversionDialogOpen] = useState(false);
-  const [selectedPieceForConversion, setSelectedPieceForConversion] = useState<Piece | null>(null);
 
   // Initialize heroes from localStorage on component mount
   useEffect(() => {
@@ -135,7 +131,10 @@ export default function GamePage() {
     }
   };
 
-  const handleConvertPiece = (piece: Piece, targetType: PieceType) => {
+  const handleDirectConvert = (piece: Piece) => {
+    const targetType = PieceConversion.getDirectConversionTarget(piece.type);
+    if (!targetType) return;
+
     const result = PieceConversion.executePieceConversion(
       piece,
       targetType,
@@ -148,7 +147,7 @@ export default function GamePage() {
       addToast({
         type: 'success',
         title: 'Piece Converted!',
-        message: `${piece.type} transformed into ${targetType}`,
+        message: `${getPieceName(piece.type)} transformed into ${getPieceName(targetType)}`,
         duration: 3000
       });
     } else {
@@ -161,9 +160,20 @@ export default function GamePage() {
     }
   };
 
-  const handleOpenConversion = (piece: Piece) => {
-    setSelectedPieceForConversion(piece);
-    setConversionDialogOpen(true);
+  const getPieceName = (pieceType: PieceType): string => {
+    const names = {
+      commander: 'Commander', soldier: 'Soldier', guard: 'Guard', raider: 'Raider',
+      horse: 'Horse', elephant: 'Elephant', tower: 'Tower', artillery: 'Artillery'
+    };
+    return names[pieceType];
+  };
+
+  const getPieceIcon = (pieceType: PieceType): string => {
+    const icons = {
+      commander: '👑', soldier: '⚔️', guard: '🛡️', raider: '🗡️',
+      horse: '🐎', elephant: '🐘', tower: '🏰', artillery: '💥'
+    };
+    return icons[pieceType as keyof typeof icons] || '❓';
   };
 
   const handleSquareClick = (position: Position) => {
@@ -387,25 +397,64 @@ export default function GamePage() {
                   🔄 Piece Conversion
                 </h4>
                 {gameState.selectedPiece && gameState.selectedPiece.player === gameState.currentPlayer ? (
-                  <div className="space-y-2">
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
-                      Selected: {gameState.selectedPiece.type} at ({gameState.selectedPiece.position.x}, {gameState.selectedPiece.position.y})
-                    </div>
-                    {PieceConversion.getConversionTargets(gameState.selectedPiece.type).length > 0 ? (
-                      <button
-                        onClick={() => handleOpenConversion(gameState.selectedPiece!)}
-                        className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
-                      >
-                        Convert Piece
-                      </button>
+                  <div className="space-y-3">
+                    {PieceConversion.canPieceBeConverted(gameState.selectedPiece.type) ? (
+                      <div>
+                        {/* Conversion Preview */}
+                        <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 mb-3">
+                          <div className="flex items-center justify-center space-x-4">
+                            {/* Current Piece */}
+                            <div className="text-center">
+                              <div className="text-xl mb-1">
+                                {getPieceIcon(gameState.selectedPiece.type)}
+                              </div>
+                              <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                {getPieceName(gameState.selectedPiece.type)}
+                              </div>
+                            </div>
+                            
+                            {/* Arrow */}
+                            <div className="text-2xl text-blue-600 dark:text-blue-400">→</div>
+                            
+                            {/* Target Piece */}
+                            <div className="text-center">
+                              <div className="text-xl mb-1">
+                                {(() => {
+                                  const target = PieceConversion.getDirectConversionTarget(gameState.selectedPiece.type);
+                                  return target ? getPieceIcon(target) : '❓';
+                                })()}
+                              </div>
+                              <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                {(() => {
+                                  const target = PieceConversion.getDirectConversionTarget(gameState.selectedPiece.type);
+                                  return target ? getPieceName(target) : '';
+                                })()}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Conversion Info */}
+                          <div className="mt-2 text-center text-xs text-green-600 dark:text-green-400">
+                            ✓ FREE conversion • Ends your turn
+                          </div>
+                        </div>
+                        
+                        {/* Convert Button */}
+                        <button
+                          onClick={() => handleDirectConvert(gameState.selectedPiece!)}
+                          className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                        >
+                          Convert Piece
+                        </button>
+                      </div>
                     ) : (
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                      <div className="text-sm text-gray-500 dark:text-gray-400 text-center py-2">
                         This piece cannot be converted
                       </div>
                     )}
                   </div>
                 ) : (
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                  <div className="text-sm text-gray-500 dark:text-gray-400 text-center py-2">
                     Select one of your pieces to convert it
                   </div>
                 )}
@@ -488,16 +537,6 @@ export default function GamePage() {
           />
         )}
 
-        {/* Piece conversion dialog */}
-        <PieceConversionDialog
-          isOpen={conversionDialogOpen}
-          onClose={() => {
-            setConversionDialogOpen(false);
-            setSelectedPieceForConversion(null);
-          }}
-          piece={selectedPieceForConversion}
-          onConvert={handleConvertPiece}
-        />
       </div>
     </div>
   );

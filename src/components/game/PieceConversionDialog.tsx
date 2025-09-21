@@ -19,11 +19,18 @@ const PieceConversionDialog: React.FC<PieceConversionDialogProps> = ({
 }) => {
   const [selectedTarget, setSelectedTarget] = useState<PieceType | null>(null);
 
+  const targetType = piece ? PieceConversion.getDirectConversionTarget(piece.type) : null;
+  
+  // Auto-select the target since there's only one option
+  React.useEffect(() => {
+    if (targetType) {
+      setSelectedTarget(targetType);
+    }
+  }, [targetType]);
+
   if (!isOpen || !piece) {
     return null;
   }
-
-  const availableTargets = PieceConversion.getConversionTargets(piece.type);
 
   const getPieceIcon = (pieceType: PieceType): string => {
     const icons = {
@@ -64,7 +71,7 @@ const PieceConversionDialog: React.FC<PieceConversionDialogProps> = ({
 
   console.log('Dialog state:', { 
     selectedTarget, 
-    availableTargets, 
+    targetType, 
     piece: piece?.type,
     isButtonDisabled: !selectedTarget 
   });
@@ -101,101 +108,48 @@ const PieceConversionDialog: React.FC<PieceConversionDialogProps> = ({
             </div>
           </div>
 
-          {/* Available Conversions */}
-          <div className="mb-6">
-            <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">
-              Available Conversions:
-            </h4>
-            <div className="space-y-3">
-              {availableTargets.map((targetType) => {
-                const conversionKey = `${piece.type}->${targetType}`;
-                const rule = CONVERSION_RULES[conversionKey];
-
-                return (
-                  <div 
-                    key={targetType}
-                    style={{
-                      padding: '12px',
-                      border: selectedTarget === targetType ? '2px solid #3b82f6' : '1px solid #d1d5db',
-                      borderRadius: '8px',
-                      backgroundColor: selectedTarget === targetType ? '#eff6ff' : 'white',
-                      cursor: 'pointer',
-                      position: 'relative',
-                      zIndex: 1000
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      console.log('=== CONVERSION OPTION CLICKED ===');
-                      console.log('Target clicked:', targetType);
-                      console.log('Event:', e);
-                      setSelectedTarget(targetType);
-                      console.log('Selected target updated to:', targetType);
-                    }}
-                    onMouseDown={(e) => {
-                      console.log('MouseDown on conversion option:', targetType);
-                    }}
-                    onMouseUp={(e) => {
-                      console.log('MouseUp on conversion option:', targetType);
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <span style={{ fontSize: '20px' }}>{getPieceIcon(targetType)}</span>
-                        <div>
-                          <h5 style={{ margin: 0, fontWeight: 'bold', color: '#111827' }}>
-                            {getPieceName(targetType)}
-                          </h5>
-                          <p style={{ margin: 0, fontSize: '12px', color: '#6b7280' }}>
-                            {rule?.description}
-                          </p>
-                        </div>
-                      </div>
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#059669' }}>
-                          FREE
-                        </div>
-                        <div style={{ fontSize: '12px', color: '#6b7280' }}>
-                          Ends turn
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Emergency backup button */}
-                    <div style={{ marginTop: '8px' }}>
-                      <button
-                        onClick={(e) => {
-                          console.log('EMERGENCY BUTTON CLICKED for:', targetType);
-                          setSelectedTarget(targetType);
-                        }}
-                        style={{
-                          padding: '4px 8px',
-                          backgroundColor: '#ef4444',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          fontSize: '12px'
-                        }}
-                      >
-                        Emergency: Select {targetType}
-                      </button>
+          {/* Conversion Preview */}
+          {targetType && (
+            <div className="mb-6">
+              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                Conversion Preview:
+              </h4>
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                <div className="flex items-center justify-center space-x-4">
+                  {/* Current Piece */}
+                  <div className="text-center">
+                    <div className="text-2xl mb-2">{getPieceIcon(piece.type)}</div>
+                    <div className="font-semibold text-gray-900 dark:text-gray-100">
+                      {getPieceName(piece.type)}
                     </div>
                   </div>
-                );
-              })}
+                  
+                  {/* Arrow */}
+                  <div className="text-3xl text-blue-600 dark:text-blue-400">→</div>
+                  
+                  {/* Target Piece */}
+                  <div className="text-center">
+                    <div className="text-2xl mb-2">{getPieceIcon(targetType)}</div>
+                    <div className="font-semibold text-gray-900 dark:text-gray-100">
+                      {getPieceName(targetType)}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Conversion Description */}
+                <div className="mt-4 text-center">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {CONVERSION_RULES[`${piece.type}->${targetType}`]?.description}
+                  </p>
+                  <div className="mt-2 text-sm font-medium text-green-600 dark:text-green-400">
+                    ✓ FREE conversion • Ends your turn
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
 
 
-          {/* Conversion Info */}
-          <div className="mb-6 p-3 bg-green-50 dark:bg-green-900/30 rounded-lg">
-            <div className="text-sm text-green-800 dark:text-green-200">
-              <strong>Conversion Cost:</strong> FREE! Conversion will end your turn.
-            </div>
-            <div className="text-xs text-gray-600 dark:text-gray-400 mt-2">
-              Debug: Selected = {selectedTarget || 'none'} | Available = {availableTargets.length} | Button disabled = {!selectedTarget ? 'true' : 'false'}
-            </div>
-          </div>
 
           {/* Action Buttons */}
           <div className="flex space-x-3">
@@ -206,24 +160,22 @@ const PieceConversionDialog: React.FC<PieceConversionDialogProps> = ({
               Cancel
             </button>
             <button
-              onClick={(e) => {
-                console.log('Convert Piece button clicked!');
-                console.log('selectedTarget:', selectedTarget);
-                console.log('Button disabled:', !selectedTarget);
+              onClick={() => {
+                console.log('Convert button clicked!');
                 if (selectedTarget) {
                   handleConvert();
-                } else {
-                  console.log('No target selected - button should not work');
                 }
               }}
-              className="flex-1 px-4 py-2 rounded-lg font-medium transition-colors"
-              style={{
-                backgroundColor: selectedTarget ? '#2563eb' : '#d1d5db',
-                color: selectedTarget ? 'white' : '#6b7280',
-                cursor: 'pointer'
-              }}
+              disabled={!selectedTarget}
+              className={`
+                flex-1 px-4 py-2 rounded-lg font-medium transition-colors
+                ${selectedTarget
+                  ? 'bg-blue-600 text-white hover:bg-blue-700'
+                  : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                }
+              `}
             >
-              Convert Piece (Selected: {selectedTarget || 'none'})
+              {targetType ? `Convert to ${getPieceName(targetType)}` : 'Convert Piece'}
             </button>
           </div>
         </div>

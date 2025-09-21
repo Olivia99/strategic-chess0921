@@ -75,6 +75,21 @@ export class PieceConversion {
   }
 
   /**
+   * Get the direct conversion target for a piece (since each piece has exactly one conversion target)
+   */
+  static getDirectConversionTarget(pieceType: PieceType): PieceType | null {
+    const pair = CONVERSION_PAIRS.find(pair => pair.from === pieceType);
+    return pair ? pair.to : null;
+  }
+
+  /**
+   * Check if a piece can be converted (has a conversion target)
+   */
+  static canPieceBeConverted(pieceType: PieceType): boolean {
+    return this.getDirectConversionTarget(pieceType) !== null;
+  }
+
+  /**
    * Get all pieces that can be converted by a player
    */
   static getConvertiblePieces(
