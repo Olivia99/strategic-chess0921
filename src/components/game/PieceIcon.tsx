@@ -28,7 +28,7 @@ export default function PieceIcon({ type, player, size = 40, className = '' }: P
   // Color filter for white/black teams
   const colorFilter = player === 'white' 
     ? 'brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%)'  // White
-    : 'brightness(0) saturate(100%) invert(10%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(10%) contrast(100%)'; // Black (not fully transparent)
+    : 'brightness(0) saturate(100%) invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%)'; // Black (100% opacity)
 
   return (
     <div 
