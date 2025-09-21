@@ -79,8 +79,16 @@ export default function Home() {
         </div>
 
         <div className="text-center mt-16">
+          <div className="mb-8">
+            <a 
+              href="/game"
+              className="inline-block bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
+            >
+              🎮 Play Demo
+            </a>
+          </div>
           <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
-            🚧 Game currently in development - Coming soon! 🚧
+            🚧 Game currently in development - Basic board view available! 🚧
           </p>
           <div className="text-sm text-gray-500 dark:text-gray-500">
             Built with Next.js, TypeScript & Tailwind CSS
