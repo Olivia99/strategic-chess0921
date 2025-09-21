@@ -96,6 +96,14 @@ export default function GameBoard({
 
   const boardPixelSize = 60 * (BOARD_SIZE - 1) + 60; // Total board size in pixels
 
+  // Special positions (golden diamond markers in center row)
+  const specialPositions = [
+    { x: 1, y: 3 },
+    { x: 3, y: 3 }, 
+    { x: 5, y: 3 }
+  ];
+
+
   return (
     <div className="flex flex-col items-center space-y-4">
       <div className="text-lg font-semibold text-gray-700">
@@ -118,6 +126,18 @@ export default function GameBoard({
         >
           {renderGridLines()}
         </svg>
+
+        {/* Special position markers */}
+        {specialPositions.map((pos, index) => (
+          <div
+            key={`special-${index}`}
+            className="absolute"
+            style={getIntersectionStyle(pos.x, pos.y)}
+          >
+            <div className="w-6 h-6 transform rotate-45 bg-yellow-400 border-2 border-yellow-600 opacity-70" 
+                 style={{ transform: 'translate(-50%, -50%) rotate(45deg)' }} />
+          </div>
+        ))}
 
         {/* Coordinate labels */}
         {Array.from({ length: BOARD_SIZE }, (_, i) => (

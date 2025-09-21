@@ -5,60 +5,46 @@ export const BOARD_SIZE = 7;
 export function createInitialBoard(): (Piece | null)[][] {
   const board: (Piece | null)[][] = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null));
   
-  // Red pieces (bottom)
+  // Red pieces (bottom - white pieces in image)
   const redPieces: { type: PieceType; x: number; y: number }[] = [
-    // Back row
+    // Back row (y=6) - Tower, Horse, Guard, Commander, Guard, Horse, Tower
     { type: 'tower', x: 0, y: 6 },
     { type: 'horse', x: 1, y: 6 },
-    { type: 'elephant', x: 2, y: 6 },
+    { type: 'guard', x: 2, y: 6 },
     { type: 'commander', x: 3, y: 6 },
-    { type: 'elephant', x: 4, y: 6 },
+    { type: 'guard', x: 4, y: 6 },
     { type: 'horse', x: 5, y: 6 },
     { type: 'tower', x: 6, y: 6 },
     
-    // Second row
-    { type: 'guard', x: 1, y: 5 },
-    { type: 'artillery', x: 2, y: 5 },
-    { type: 'raider', x: 3, y: 5 },
-    { type: 'artillery', x: 4, y: 5 },
-    { type: 'guard', x: 5, y: 5 },
-    
-    // Soldiers
-    { type: 'soldier', x: 0, y: 4 },
-    { type: 'soldier', x: 1, y: 4 },
-    { type: 'soldier', x: 2, y: 4 },
-    { type: 'soldier', x: 3, y: 4 },
-    { type: 'soldier', x: 4, y: 4 },
-    { type: 'soldier', x: 5, y: 4 },
-    { type: 'soldier', x: 6, y: 4 },
+    // Soldier row (y=5) - All soldiers
+    { type: 'soldier', x: 0, y: 5 },
+    { type: 'soldier', x: 1, y: 5 },
+    { type: 'soldier', x: 2, y: 5 },
+    { type: 'soldier', x: 3, y: 5 },
+    { type: 'soldier', x: 4, y: 5 },
+    { type: 'soldier', x: 5, y: 5 },
+    { type: 'soldier', x: 6, y: 5 },
   ];
 
-  // Blue pieces (top)
+  // Blue pieces (top - black pieces in image)
   const bluePieces: { type: PieceType; x: number; y: number }[] = [
-    // Back row
+    // Back row (y=0) - Tower, Horse, Guard, Commander, Guard, Horse, Tower
     { type: 'tower', x: 0, y: 0 },
     { type: 'horse', x: 1, y: 0 },
-    { type: 'elephant', x: 2, y: 0 },
+    { type: 'guard', x: 2, y: 0 },
     { type: 'commander', x: 3, y: 0 },
-    { type: 'elephant', x: 4, y: 0 },
+    { type: 'guard', x: 4, y: 0 },
     { type: 'horse', x: 5, y: 0 },
     { type: 'tower', x: 6, y: 0 },
     
-    // Second row
-    { type: 'guard', x: 1, y: 1 },
-    { type: 'artillery', x: 2, y: 1 },
-    { type: 'raider', x: 3, y: 1 },
-    { type: 'artillery', x: 4, y: 1 },
-    { type: 'guard', x: 5, y: 1 },
-    
-    // Soldiers
-    { type: 'soldier', x: 0, y: 2 },
-    { type: 'soldier', x: 1, y: 2 },
-    { type: 'soldier', x: 2, y: 2 },
-    { type: 'soldier', x: 3, y: 2 },
-    { type: 'soldier', x: 4, y: 2 },
-    { type: 'soldier', x: 5, y: 2 },
-    { type: 'soldier', x: 6, y: 2 },
+    // Soldier row (y=1) - All soldiers
+    { type: 'soldier', x: 0, y: 1 },
+    { type: 'soldier', x: 1, y: 1 },
+    { type: 'soldier', x: 2, y: 1 },
+    { type: 'soldier', x: 3, y: 1 },
+    { type: 'soldier', x: 4, y: 1 },
+    { type: 'soldier', x: 5, y: 1 },
+    { type: 'soldier', x: 6, y: 1 },
   ];
 
   // Place red pieces
